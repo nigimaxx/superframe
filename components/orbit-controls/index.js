@@ -41,16 +41,12 @@ AFRAME.registerComponent('orbit-controls', {
     oldPosition = new THREE.Vector3();
 
     this.bindMethods();
-    el.sceneEl.addEventListener('enter-vr', this.onEnterVR); 
+    el.sceneEl.addEventListener('enter-vr', this.onEnterVR);
     el.sceneEl.addEventListener('exit-vr', this.onExitVR);
 
     document.body.style.cursor = 'grab';
-    document.addEventListener('mousedown', () => {
-      document.body.style.cursor = 'grabbing';
-    });
-    document.addEventListener('mouseup', () => {
-      document.body.style.cursor = 'grab';
-    });
+    document.addEventListener('mousedown', this.onMouseDown);
+    document.addEventListener('mouseup', this.onMouseUp);
 
     this.target = new THREE.Vector3();
     el.getObject3D('camera').position.copy(this.data.initialPosition);
@@ -79,6 +75,14 @@ AFRAME.registerComponent('orbit-controls', {
     if (el.hasAttribute('look-controls')) {
       el.setAttribute('look-controls', 'enabled', false);
     }
+  },
+
+  onMouseDown: function() {
+    document.body.style.cursor = 'grabbing';
+  },
+
+  onMouseUp: function() {
+    document.body.style.cursor = 'grab';
   },
 
   bindMethods: function() {
@@ -126,6 +130,9 @@ AFRAME.registerComponent('orbit-controls', {
   remove: function() {
     this.controls.reset();
     this.controls.dispose();
+
+    document.removeEventListener('mousedown', this.onMouseDown);
+    document.removeEventListener('mouseup', this.onMouseUp);
 
     this.el.sceneEl.removeEventListener('enter-vr', this.onEnterVR);
     this.el.sceneEl.removeEventListener('exit-vr', this.onExitVR);
